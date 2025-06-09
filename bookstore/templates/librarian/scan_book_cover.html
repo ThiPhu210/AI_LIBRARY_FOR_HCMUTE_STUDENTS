@@ -1,0 +1,169 @@
+{% extends 'librarian/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="col-md-8 col-sm-5 col-xs-5">
+<div id="content" class="p-6 p-md-5 pt-5">
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-camera text-primary"></i> Scan Book Cover with Camera
+        </div>
+        <div class="card-body">
+
+            <h5>Scan Book Cover with Camera</h5>
+            <button id="startCameraButton" class="btn btn-primary mb-3">Start Camera</button>
+            <video id="cameraFeed" style="width: 100%; max-width: 640px; display: none;" autoplay></video>
+            <button id="captureButton" class="btn btn-success mt-3" style="display: none;">Capture Image</button>
+            <canvas id="capturedCanvas" style="display: none;"></canvas>
+            <img id="capturedImage" style="max-width: 100%; display: none; margin-top: 15px;" alt="Captured Image">
+            <button id="processCameraButton" class="btn btn-success mt-3" style="display: none;">Extract Info from Captured Image</button>
+
+            <div id="ocrResult" class="mt-4" style="display: none;">
+                <h6>OCR Results:</h6>
+                <pre id="ocrText"></pre>
+                <h6>Extracted Info:</h6>
+                <p>Title: <span id="extractedTitle"></span></p>
+                <p>Author: <span id="extractedAuthor"></span></p>
+                <!-- Add a form here later to save the book -->
+            </div>
+
+            <div id="loadingSpinner" class="text-center mt-4" style="display: none;">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Processing image...</p>
+            </div>
+
+            <div id="errorMessage" class="alert alert-danger mt-4" style="display: none;"></div>
+
+
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    const startCameraButton = document.getElementById('startCameraButton');
+    const cameraFeed = document.getElementById('cameraFeed');
+    const captureButton = document.getElementById('captureButton');
+    const capturedCanvas = document.getElementById('capturedCanvas');
+    const capturedImage = document.getElementById('capturedImage');
+    const processCameraButton = document.getElementById('processCameraButton');
+    const ocrResultDiv = document.getElementById('ocrResult');
+    const ocrTextPre = document.getElementById('ocrText');
+    const extractedTitleSpan = document.getElementById('extractedTitle');
+    const extractedAuthorSpan = document.getElementById('extractedAuthor');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessageDiv = document.getElementById('errorMessage');
+
+    let currentStream;
+
+    startCameraButton.addEventListener('click', async () => {
+        errorMessageDiv.style.display = 'none';
+        capturedImage.style.display = 'none';
+        processCameraButton.style.display = 'none';
+        ocrResultDiv.style.display = 'none';
+
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            currentStream = stream;
+            cameraFeed.srcObject = stream;
+            cameraFeed.style.display = 'block';
+            captureButton.style.display = 'block';
+            startCameraButton.style.display = 'none'; // Hide start button once camera is on
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            errorMessageDiv.textContent = 'Error accessing camera. Please make sure you have a camera and have granted permission.';
+            errorMessageDiv.style.display = 'block';
+        }
+    });
+
+    captureButton.addEventListener('click', () => {
+        if (!currentStream) {
+            errorMessageDiv.textContent = 'Camera not started.';
+            errorMessageDiv.style.display = 'block';
+            return;
+        }
+
+        errorMessageDiv.style.display = 'none';
+        ocrResultDiv.style.display = 'none';
+
+        const context = capturedCanvas.getContext('2d');
+        capturedCanvas.width = cameraFeed.videoWidth;
+        capturedCanvas.height = cameraFeed.videoHeight;
+        context.drawImage(cameraFeed, 0, 0, cameraFeed.videoWidth, cameraFeed.videoHeight);
+
+        const imageDataUrl = capturedCanvas.toDataURL('image/jpeg');
+        capturedImage.src = imageDataUrl;
+        capturedImage.style.display = 'block';
+        processCameraButton.style.display = 'block';
+        // Optionally stop the camera after capture
+        // currentStream.getTracks().forEach(track => track.stop());
+        // cameraFeed.style.display = 'none';
+        // captureButton.style.display = 'none';
+        // startCameraButton.style.display = 'block';
+    });
+
+    processCameraButton.addEventListener('click', async () => {
+        errorMessageDiv.style.display = 'none';
+        ocrResultDiv.style.display = 'none';
+        loadingSpinner.style.display = 'block';
+        processCameraButton.disabled = true;
+
+        capturedCanvas.width = capturedImage.width; // Use displayed image dimensions
+        capturedCanvas.height = capturedImage.height;
+        const context = capturedCanvas.getContext('2d');
+        context.drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
+
+        capturedCanvas.toBlob(async (blob) => {
+            const formData = new FormData();
+            formData.append('cover', blob, 'captured_image.jpg'); // Use 'cover' as the field name
+
+            try {
+                // This URL needs to point to the new view for camera processing
+                const response = await fetch('{% url "scan_book_cover_form" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                ocrTextPre.textContent = data.ocr_text || 'N/A';
+                extractedTitleSpan.textContent = data.title || 'N/A';
+                extractedAuthorSpan.textContent = data.author || 'N/A';
+                ocrResultDiv.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error processing image:', error);
+                errorMessageDiv.textContent = `Error processing image: ${error.message}`;
+                errorMessageDiv.style.display = 'block';
+            } finally {
+                loadingSpinner.style.display = 'none';
+                processCameraButton.disabled = false;
+            }
+        }, 'image/jpeg');
+    });
+
+    // Clean up camera stream when the page is closed or navigated away
+    window.addEventListener('beforeunload', () => {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+    });
+
+</script>
+
+{% endblock %} 

@@ -2,47 +2,111 @@
 {% load static %}
 
 {% block body %}
+<style>
+    .container-fluid {
+        background-color: #f8f9fa;
+        padding-bottom: 20px;
+    }
+
+    .card {
+         margin-bottom: 20px;
+    }
+
+    .row {
+        padding: 0 10px;
+    }
+
+    .card-header h3 {
+        color: #000 !important;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 0.25rem;
+        border: 1px solid #ced4da;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .hidden-field {
+        display: none;
+    }
+</style>
 <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 mb-3">
-          <div class="col-12 mb-3">
-              <div id="content-wrapper">
-        <div class="container-fluid">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="">Book Title : {{ object.title }} </a>
-            </ol>
-            <div class="card mb-3">
-                <div class="card-header">
-                    <i class="fas fa-table text-warning"></i>
-                    Details Of Book
+    <div class="row" style="padding-top: 30px">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-edit fa-2x me-3"></i>
+                        <h3 class="mb-0 fw-bold">Chỉnh Sửa Sách</h3>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
+                    <!-- Messages -->
                     {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                            {{ message }}
-                        </div>
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                     {% endfor %}
 
-    <div class="row">
-        <div class="col-12">
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                    {% if field.name == 'title' or field.name == 'author' %}
+                                    <div class="form-group">
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        {{ field }}
+                                    </div>
+                                    {% else %}
+                                    <div class="hidden-field">
+                                        {{ field }}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        {% if request.path == '/new' %}Thêm Mới{% else %}Cập Nhật{% endif %}
+                                    </button>
+                                    <a href="{% url 'lmbook' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Quay Lại
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                {% endfor %}
-                <input type="submit" {% if request.path == '/new' %} value="Add" {% else %} value="Update" {% endif %} class="btn btn-success"/>
-                <a href="{% url 'lmbook' %}"><button type="button" class="btn btn-secondary">Back</button></a>
-            </form>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-
-          </div>
-        </div>
-      </div>
-    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Lấy tất cả các trường ẩn
+    const hiddenFields = document.querySelectorAll('.hidden-field input, .hidden-field textarea');
+    
+    // Điền giá trị mặc định cho các trường ẩn
+    hiddenFields.forEach(field => {
+        if (field.type === 'text' || field.type === 'textarea') {
+            field.value = field.value || ' ';
+        } else if (field.type === 'file') {
+            // Giữ nguyên file đã upload
+            field.required = false;
+        }
+    });
+});
+</script>
 {% endblock %}

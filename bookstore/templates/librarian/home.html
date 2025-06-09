@@ -1,63 +1,89 @@
 {% extends 'librarian/base.html' %}
 {% load static %}
 
-
 {% block body %}
-<div class="col-md-8 col-sm-5 col-xs-5">
+<style>
+    .container-fluid {
+        background-color: #f8f9fa;
+        padding-bottom: 20px;
+    }
 
+    .card {
+         margin-bottom: 20px;
+    }
 
- <div id="content-wrapper">
-        <div class="container-fluid">
-            <!-- Breadcrumbs-->
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item active">Overview</li>
-            </ol>
+    .row {
+        padding: 0 10px;
+    }
 
-            <!-- Icon Cards-->
-            <div class="row">
-                                <div class="col-xl-3 col-sm-6 mb-3">
-                    <div class="card text-white bg-success o-hidden h-100">
-                        <div class="card-body">
-                            <div class="card-body-icon">
-                                <i class="fas fa-fw fa-book"></i>
-                            </div>
-                            <div class="mr-5"> <strong>Books</strong> : {{ book }}</div>
-                        </div>
-                        <a class="card-footer text-white clearfix small z-1" href="#">
-                            <span class="float-left">Total Books</span><br>
-                            <span class="float-right">
-                </span>
-                        </a>
+    .card-header h3 {
+        color: #000 !important;
+    }
+
+    .card-body-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+    }
+
+    .card-footer {
+        border-top: 1px solid rgba(255,255,255,0.2);
+    }
+</style>
+<div class="container-fluid">
+    <div class="row" style="padding-top: 30px">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-tachometer-alt fa-2x me-3"></i>
+                        <h3 class="mb-0 fw-bold">Tổng Quan</h3>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-sm-6 mb-3">
-                    <div class="card text-white bg-warning o-hidden h-100">
-                        <div class="card-body">
-                            <div class="card-body-icon">
-                                <i class="fas fa-user-circle fa-fw"></i>
+                <div class="card-body p-4">
+                    <!-- Icon Cards-->
+                    <div class="row">
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-success o-hidden h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-body-icon">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        <div>
+                                            <div class="h5 mb-0">Sách</div>
+                                            <div class="h3 mb-0">{{ book }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-white">
+                                    <div class="small">Tổng số sách</div>
+                                </div>
                             </div>
-                            <div class="mr-5"> <strong>Users</strong> : {{ user }}</div>
                         </div>
-                        <a class="card-footer text-white clearfix small z-1" href="">
-                            <span class="float-left">Total Users</span><br>
-                            <span class="float-right">
-                </span>
-                        </a>
+
+                        <div class="col-xl-3 col-sm-6 mb-3">
+                            <div class="card text-white bg-warning o-hidden h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="card-body-icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div>
+                                            <div class="h5 mb-0">Người dùng</div>
+                                            <div class="h3 mb-0">{{ user }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-white">
+                                    <div class="small">Tổng số người dùng</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        </div>  
-
-
-
             </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

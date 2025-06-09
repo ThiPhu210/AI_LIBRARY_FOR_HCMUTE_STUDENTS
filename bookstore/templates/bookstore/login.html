@@ -1,200 +1,397 @@
 {% load static %}
-
-{% comment %} <video loop muted autoplay playsinline class="video">
-  <source src="{% static 'css/back.mp4' %}" type="video/mp4" />
-</video> {% endcomment %}
-<!-- Custom styles for this template-->
-    <link href="{% static 'bookstore/css/login.css' %}" rel="stylesheet">
-    <link href="{% static 'bookstore/css/bootstrap/bootstrap.min.js' %}" rel="stylesheet">
-    <link href="{% static 'bookstore/js/login.css' %}" rel="stylesheet">
-    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
-    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
-
-
-    
-{% comment %} <head>
-	<title>BookApp</title>
-</head> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-  {% block title %}{% endblock %}
-  <title>HCMUTE Library</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Thư Viện HCMUTE - Đăng nhập</title>
 
-
-  {% block stylesheets %}
     <!-- Bootstrap CSS -->
- 
-    <!-- Custom CSS -->
-    <style media="screen">
-      .invalid {
-        color: #dc3545;
-        font-size: 80%;
-      }
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-      .footer {
-        margin: auto 0 0;
-        height: 56px;
-      }
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        /* Reset some default browser styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            background: linear-gradient(135deg, #8e9dc0 0%, #c7b9d7 100%); /* Background gradient */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            padding-top: 60px; /* Space for fixed navbar */
+            box-sizing: border-box;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important; /* Navbar blue gradient */
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            padding: 0.5rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #fff !important;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            color: #64b5f6 !important;
+        }
+
+        .login-page-container {
+            flex: 1; /* Allow container to grow and take available space */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .bookapp-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffeb3b; /* Yellow color */
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .login-card {
+            background: #343a40; /* Dark background */
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px; /* Increased from 400px to 500px */
+            padding: 2.5rem; /* Increased padding */
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .login-header-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-options-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Responsive grid */
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-option-btn {
+            padding: 0.5rem 0.3rem; /* Adjust padding */
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem; /* Adjust font size */
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column; /* Stack icon and text */
+            align-items: center;
+            justify-content: center;
+            gap: 0.1rem; /* Adjust gap */
+            word-break: break-word; /* Allow text break */
+            box-sizing: border-box;
+            min-width: 0; /* Allow shrinking */
+        }
+
+        .login-option-btn i {
+             font-size: 1.2rem; /* Adjust icon size */
+        }
+
+        .btn-face {
+            background-color: #007bff; /* Blue */
+        }
+
+        .btn-qr {
+            background-color: #28a745; /* Green */
+        }
+
+        .btn-password {
+            background-color: #17a2b8; /* Teal */
+        }
+
+        .login-option-btn:hover {
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .form-group label {
+             display: block;
+             margin-bottom: 0.5rem;
+             font-weight: 500;
+             color: white; /* White color for labels in dark card */
+        }
+
+        .input-group {
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ced4da;
+        }
+
+        .input-group-prepend .input-group-text {
+            background-color: #e9ecef;
+            border: none;
+            color: #495057;
+        }
+
+        .form-control {
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: right;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem; /* Space between buttons */
+            margin-top: 1.5rem;
+        }
+
+        .action-button {
+            flex-grow: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #212529; /* Dark text */
+            background-color: #ffc107; /* Yellow color */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-sizing: border-box;
+            min-width: 0; /* Allow shrinking */
+        }
+
+        .action-button i {
+            margin-right: 0.5rem;
+        }
+
+        .action-button:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+        }
+
+        /* Style for messages */
+        .message-container {
+            margin-top: 1.5rem;
+        }
+
+        .alert {
+            border-radius: 5px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+         @media (max-width: 500px) {
+            .login-page-container {
+                padding: 1rem; /* Reduce padding on very small screens */
+            }
+
+             .login-card {
+                 padding: 1.5rem; /* Reduce card padding */
+             }
+
+             .bookapp-title {
+                 font-size: 2.5rem;
+             }
+
+             .login-header-text {
+                 font-size: 1.5rem;
+             }
+
+             .login-options-buttons {
+                 grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); /* Adjust minmax */
+                 gap: 0.3rem; /* Reduce gap */
+             }
+
+              .login-option-btn {
+                  padding: 0.4rem 0.1rem; /* Adjust padding */
+                  font-size: 0.8rem; /* Adjust font size */
+                  gap: 0.1rem;
+              }
+
+               .login-option-btn i {
+                   font-size: 1rem; /* Adjust icon size */
+               }
+
+             .action-buttons {
+                 flex-direction: column;
+                 gap: 0.8rem;
+             }
+
+              .action-button {
+                  width: 100%;
+                  min-width: auto;
+              }
+         }
     </style>
-  {% endblock stylesheets %}
-
-  {% load static %}
-  <!-- Custom fonts for this template-->
-  <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
-     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
-    <!-- Font awesome CSS -->
-    <link rel="stylesheet" href="{% static 'assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
-
-  <!-- Page level plugin CSS-->
-  <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
-
-  <!-- Custom styles for this template-->
-  <link rel="stylesheet" type="text/css" href="{% static 'css/master.css' %}">
-  <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
-  {% block stylesheet %}{% endblock %}
 </head>
 
-<body id="page-top">
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand navbar-dark fixed-top">
+        <a class="navbar-brand" href="">
+            <i class="fas fa-book-reader"></i>
+            Thư Viện HCMUTE
+        </a>
+         <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
 
-<!-- headers-->
-<nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+    <div class="login-page-container">
+        <div class="login-card">
+            <div class="login-header-text">Đăng nhập</div>
 
-  <a class="navbar-brand mr-1 text-primary" href="">HCMUTE Library</a>
-  <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-      <i class="fas fa-bars"></i>
-  </button>
-
-  <!-- Navbar -->
-  {% comment %} <ul class="navbar-nav ml-auto ml-md-0">
-      <li class="nav-item dropdown no-arrow">
-          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-user-circle fa-fw text-primary"></i>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-              <a class="dropdown-item">{{ user.username }}</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="" data-toggle="modal" data-target="#logoutModal">Logout</a>
-          </div>
-      </li>
-  </ul> {% endcomment %}
-
-</nav>
-
-<div id="wrapper" style="padding-top: 50px">
-<!--Coded with love by Mutiullah Samim-->
-<body> 
-
-
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-
-
-<div class="container">
-<br> 
-
-
-		 <h1 style="color: white" class="text-md-center"><span class="g"></span><span class="o"></span><span class="o1">BookApp</span> <span class="g"></span><span class="l"></span><span class="e"></span></h1>
-
-<div class="row">
-	<aside class="col-sm-4">
-	</aside> <!-- col.// -->
-
-	<aside class="col-sm-4">
-		<h1 style="color: yellow; font-weight: bold; font-size: 40px" class="text-md-center"><span class="g"></span><span class="o"></span><span class="o1"></span>BookApp<span class="g"></span><span class="l"></span><span class="e"></span></h1>
-		<br>
-<div class="card">
-<article class="card-body" style="padding-top: 0px">
-<div class="d-flex justify-content-center">
-
-
-
-
-	<div class="container">
-  <div class="d-flex justify-content-center h-100">
-    <div class="card">
-      <div class="card-header">
-        <center><h3>Login In Here</h3></center>
-        <div class="d-flex justify-content-end">
-          <span><i class="fab fa-user"></i></span>
-        </div>
-      </div>
-      <div class="card-body">
-        <form method="POST" action="{% url 'login' %}">
-          {% csrf_token %}
-          <div class="input-group form-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fas fa-user"></i></span>
+            <!-- Login Options Buttons -->
+            <div class="login-options-buttons">
+                <button class="login-option-btn btn-face" onclick="showFaceLogin()">
+                    <i class="fas fa-camera"></i> Face Login
+                </button>
+                <button class="login-option-btn btn-qr" onclick="showQRLogin()">
+                    <i class="fas fa-qrcode"></i> QR Login
+                </button>
+                <button class="login-option-btn btn-password" onclick="showPasswordLogin()">
+                    <i class="fas fa-key"></i> Password Login
+                </button>
             </div>
-            <input type="text" class="form-control" placeholder="username" name="username" required="">
-            
-          </div>
-          <div class="input-group form-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fas fa-key"></i></span>
-            </div>
-            <input type="password" class="form-control" placeholder="password" name="password" required="">
-          </div>
-          <div class="form-group">
-            <input type="submit" name="sign-in" value="Sign In" class="btn float-left login_btn">
-          </div>
-          <div class="form-group">
-            <a href="{% url 'regform' %}"><input name="sign-up" value="Register" class="btn float-right login_btn"></a>
-          </div>
-        </form>
-      </div>
-      <div class="card-footer">
-        <div class="d-flex justify-content-center">
-              {% if messages %}
-            <div class="messages">
+
+            <!-- Password Login Form -->
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="username" placeholder="Nhập tên đăng nhập" name="username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        </div>
+                        <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" name="password" required>
+                    </div>
+                </div>
+
+                <a href="#" class="forgot-password">Quên mật khẩu?</a>
+
+                <div class="action-buttons">
+                     <button type="submit" class="action-button">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                     </button>
+                     <a href="{% url 'regform' %}" class="action-button">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                     </a>
+                </div>
+            </form>
+
+            {% if messages %}
+            <div class="message-container">
                 {% for message in messages %}
-
-                    <a class="alert alert-success" style="color:red;"> {{ message }}</a>
-
+                <div class="alert alert-danger">{{ message }}</div>
                 {% endfor %}
             </div>
             {% endif %}
-              </div>
-      </div>
+
+        </div>
     </div>
-  </div>
-</div>
-		
 
+    <!-- Scripts -->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        function showFaceLogin() {
+            window.location.href = "{% url 'loginapp:face_login' %}"; // Replace with actual URL name if different
+        }
 
+        function showQRLogin() {
+          alert('QR Login clicked - Implement QR login logic'); // Placeholder
+          // Example: Fetch QR code image source via AJAX if needed
+          /*
+          fetch('{% url 'show_qr' %}') // Replace with your QR code URL
+            .then(response => response.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, 'text/html');
+              const qrCodeImg = doc.querySelector('#qrCode'); // Adjust selector
+              if (qrCodeImg) {
+                   // Display the QR code image to the user (e.e.g., in a modal)
+                   console.log('QR Code Source:', qrCodeImg.src);
+              }
+            }).catch(error => console.error('Error fetching QR code:', error));
+          */
+        }
 
+        function showPasswordLogin() {
+           alert('Password Login clicked - Implement password login logic or just focus the form'); // Placeholder
+            // This button might just reveal the password form if it were hidden
+        }
 
-
-
-</article>
-</div> <!-- card.// -->
-
-
-
-
-	</aside> <!-- col.// -->
-	<aside class="col-sm-4">
-	</aside> <!-- col.// -->
-</div> <!-- row.// -->
-
-</div> 
-
-
-                            
-
+    </script>
 </body>
 </html>
-

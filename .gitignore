@@ -1,2 +1,9 @@
 media
 .venv
+loginapp/image
+bookapp/__pycache__
+bookstore/data/pdfs/
+bookstore/data/covers/
+bookstore/management/commands/data/pdfs/
+bookstore/management/commands/data/covers/
+bookstore/management/commands/data/

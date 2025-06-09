@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 import uuid
 import numpy as np
+from django.utils.translation import gettext_lazy as _
 
 
 #User = get_user_model()
@@ -15,7 +16,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     is_publisher = models.BooleanField(default=False)
     is_librarian = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=True)
+    is_student = models.BooleanField(default=False)
 
     face_embedding = models.BinaryField(null=True, blank=True)
     qr_code = models.CharField(max_length=255, null=True, blank=True)
@@ -148,6 +149,20 @@ class Feedback(models.Model):
 
     def __str__(self):
         return self.feedback
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    student_id = models.CharField(max_length=20, unique=True, verbose_name=_('Student ID'))
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Student Profile')
+        verbose_name_plural = _('Student Profiles')
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} - {self.student_id}"
+
 
 
 

@@ -1,84 +1,131 @@
 {% extends 'publisher/base.html' %}
 {% load static %}
 
-
 {% block body %}
+<style>
+    .container-fluid {
+        padding: 20px;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 15px 20px;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+    
+    .card-header i {
+        margin-right: 10px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #1a237e;
+        box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.1);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+    }
+    
+    .alert {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .note-text {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+</style>
 
 <div class="container-fluid">
-<div class="row">
-<div class="col-sm-3" style="color: red">
-  <p style="color: blue"></p>  
-</div>
+    <div class="row" style="padding-top: 70px">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-trash-alt text-white"></i>
+                    Yêu Cầu Xóa Sách
+                </div>
+                <div class="card-body">
+                    <div class="note-text text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Lưu ý: Hãy đảm bảo rằng sách bạn yêu cầu xóa<br>
+                        là do bạn đăng tải. Nếu không, yêu cầu xóa sẽ không được chấp nhận.
+                    </div>
 
-
-
-<div class="col-sm-6" style="padding-top: 87px">
-    <div class="card">
-  <div class="card-header">
-          <i class="fas fa-table text-primary"></i>
-    Enter book ID To Delete
-  </div>
-  <center><p class="">Note: Make sure the book you request to be deleted</br>
-  was uploaded by you. Unless otherwise, the book will</br>
-not be deleted</p></center>
-</div>
-
-
-<div class="card mb-4">
-<div class="card-body">
-
-<div class="row">
-	<div class="col-sm-4"></div>
-	<div class="form-group">
-    <form action="{% url 'delete_request' %}" method="POST">
-    {% csrf_token %}
-  <label for="comment">Type In Book ID</label>
-  <textarea class="form-control" rows="5" id="comment" name="delete_request"></textarea>
-  <br>
-  <a href=""><button type="submit" class="btn btn-primary"> Send</button></a>
-</form>
-<br>
-<br>
-   <div class="card-footer">
-        <div class="d-flex justify-content-center">
-
-<div style="color: blue">
-
-              {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                            {{ message }}
+                    <form action="{% url 'delete_request' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="delete_request" class="form-label">
+                                <i class="fas fa-keyboard me-2"></i>Nhập Mã Sách Cần Xóa
+                            </label>
+                            <textarea class="form-control" rows="3" id="delete_request" name="delete_request" 
+                                    placeholder="Nhập mã sách cần xóa..."></textarea>
                         </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Gửi Yêu Cầu
+                            </button>
+                        </div>
+                    </form>
+
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     {% endfor %}
-              </div>
-      </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
 </div>
 
-
-	<div class="col-sm-4"></div>
-	</div>
-
-
-                      </div>
-                    </div>  
-                  </div>
-
-</div>
-
-
-
-<div class="col-sm-3" style="color: red">
-</div>
-
-</div>
-</div>
-
-    <script type="text/javascript" src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.dataTables.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
-</body>
-
-</html>
+<script type="text/javascript" src="{% static 'js/jquery-2.1.3.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
 {% endblock %}
 
 

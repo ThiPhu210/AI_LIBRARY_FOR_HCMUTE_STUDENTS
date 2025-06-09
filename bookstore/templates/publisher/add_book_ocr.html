@@ -1,0 +1,238 @@
+{% extends 'publisher/base.html' %}
+{% load static %}
+
+{% block body %}
+<style>
+    .container-fluid {
+        padding: 20px;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        color: white;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 15px 20px;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+    
+    .card-header i {
+        margin-right: 10px;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #1a237e;
+        box-shadow: 0 0 0 0.2rem rgba(26, 35, 126, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        padding: 10px 25px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(26, 35, 126, 0.3);
+    }
+
+    .input-group-text {
+        background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+        border: none;
+        color: white;
+    }
+
+    /* Custom Spinner Styles */
+    .custom-spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 0.25rem solid #e9ecef;
+        border-right-color: #1a237e;
+        border-radius: 50%;
+        animation: spinner-border 0.75s linear infinite;
+        margin-right: 2rem !important;
+    }
+
+    @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row" style="padding-top: 70px">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-pdf text-white"></i>
+                    Thêm Sách Bằng PDF
+                </div>
+                <div class="card-body p-4">
+                    <!-- Hướng dẫn -->
+                    <div class="alert alert-info border-0 shadow-sm mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle fa-2x me-3"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading mb-2">Hướng dẫn sử dụng</h5>
+                                <p class="mb-2">Tải lên file PDF của sách. Hệ thống sẽ tự động:</p>
+                                <ol class="mb-0">
+                                    <li>Trích xuất trang đầu tiên làm ảnh bìa</li>
+                                    <li>Phân tích nội dung để lấy thông tin sách</li>
+                                    <li>Tự động điền các thông tin cần thiết</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Upload -->
+                    <form action="{% url 'uabook_ocr' %}" method="POST" enctype="multipart/form-data" id="pdfForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold mb-3">
+                                <i class="fas fa-upload me-2"></i>Chọn File PDF
+                            </label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" name="pdf" accept=".pdf" required id="pdfInput">
+                                <span class="input-group-text">
+                                    <i class="fas fa-file-pdf"></i>
+                                </span>
+                            </div>
+                            <div class="form-text text-muted mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                Chỉ chấp nhận file PDF. Trang đầu tiên sẽ được sử dụng làm ảnh bìa.
+                            </div>
+                        </div>
+
+                        <!-- Preview Area -->
+                        <div id="previewArea" class="mb-4" style="display: none;">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3">
+                                        <i class="fas fa-eye me-2"></i>Xem trước
+                                    </h6>
+                                    <div class="text-center">
+                                        <img id="previewImage" class="img-fluid rounded shadow-sm" style="max-height: 300px;" alt="Preview">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-magic me-2"></i>Trích Xuất Thông Tin
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Processing Status -->
+                    <div id="processingStatus" class="mt-4" style="display: none;">
+                        <div class="alert alert-primary border-0 shadow-sm">
+                            <div class="d-flex align-items-center">
+                                <div class="custom-spinner me-3" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading mb-2">Đang xử lý...</h5>
+                                    <p class="mb-0">Vui lòng đợi trong giây lát. Hệ thống đang phân tích PDF và trích xuất thông tin sách.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
+</div>
+
+<script>
+// Preview PDF first page
+document.getElementById('pdfInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Create PDF.js viewer
+            pdfjsLib.getDocument(e.target.result).promise.then(function(pdf) {
+                pdf.getPage(1).then(function(page) {
+                    const scale = 1.5;
+                    const viewport = page.getViewport({scale: scale});
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    page.render(renderContext).promise.then(function() {
+                        document.getElementById('previewImage').src = canvas.toDataURL();
+                        document.getElementById('previewArea').style.display = 'block';
+                    });
+                });
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    }
+});
+
+// Form submission
+document.getElementById('pdfForm').addEventListener('submit', function(e) {
+    // Show processing status
+    document.getElementById('processingStatus').style.display = 'block';
+    
+    // Disable submit button
+    const submitButton = this.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang Xử Lý...';
+});
+
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+
+<!-- Add PDF.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+</script>
+{% endblock %} 

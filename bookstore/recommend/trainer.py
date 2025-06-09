@@ -42,7 +42,14 @@ class RLTrainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-5, weight_decay=1e-4)
         self.device = device
 
-    def train(self, episodes=1000, gamma=0.99, patience=50):
+    def train(self, episodes=70, gamma=0.99, patience=50, learning_rate=1e-5, weight_decay=1e-4):
+        # Cập nhật optimizer với learning rate và weight decay mới
+        self.optimizer = optim.Adam(
+            self.model.parameters(),
+            lr=learning_rate,
+            weight_decay=weight_decay
+        )
+
         users = list(User.objects.all())
         episode_rewards = []
         smoothed_rewards = []
@@ -54,6 +61,13 @@ class RLTrainer:
             torch.cuda.reset_peak_memory_stats()
             torch.cuda.empty_cache()
             torch.cuda.init()
+
+        # Tính toán max_reward để chuẩn hóa
+        max_reward = 0
+        for user in users:
+            interactions = UserBookInteraction.objects.filter(user=user)
+            for inter in interactions:
+                max_reward = max(max_reward, inter.get_reward())
 
         for episode in range(episodes):
             user = random.choice(users)
@@ -77,25 +91,32 @@ class RLTrainer:
             if target_idx is None:
                 continue
 
-            reward = last_inter.get_reward()
-            scaled_reward = reward  # hoặc thử scaled_reward = reward / max_reward nếu reward gốc lớn
+            # Tính toán reward và chuẩn hóa
+            base_reward = last_inter.get_reward()
+            normalized_reward = base_reward / max_reward if max_reward > 0 else base_reward
 
             probs = torch.softmax(logits, dim=1)
             entropy = -torch.sum(probs * torch.log(probs + 1e-8))
             log_prob = torch.log(probs[0, target_idx] + 1e-8)
             predicted_idx = torch.argmax(probs[0], dim=0).item()
-            prediction_bonus = 2.0 if predicted_idx == target_idx else 0.0  # tăng bonus
+            
+            # Điều chỉnh prediction bonus
+            prediction_bonus = 1.0 if predicted_idx == target_idx else -0.5
 
-            discounted_reward = (scaled_reward + prediction_bonus) * (gamma ** (len(interactions) - 1))
+            # Tính toán discounted reward với gamma
+            discounted_reward = (normalized_reward + prediction_bonus) * (gamma ** (len(interactions) - 1))
 
-            # Giảm hệ số entropy
-            loss = -log_prob * discounted_reward - 0.01 * entropy
-
-            if predicted_idx != target_idx:
-                loss += 0.01
+            # Điều chỉnh loss function
+            policy_loss = -log_prob * discounted_reward
+            entropy_loss = -0.01 * entropy  # Giảm hệ số entropy
+            prediction_loss = 0.1 * torch.nn.functional.cross_entropy(logits[0], torch.tensor([target_idx], device=self.device))
+            
+            total_loss = policy_loss + entropy_loss + prediction_loss
 
             self.optimizer.zero_grad()
-            loss.backward()
+            total_loss.backward()
+            # Gradient clipping để tránh exploding gradients
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
             self.optimizer.step()
 
             episode_rewards.append(discounted_reward)
@@ -112,23 +133,23 @@ class RLTrainer:
                     break
 
             if episode % 10 == 0:
-                print(f"Episode {episode}: Loss={loss.item():.4f}, Reward={smoothed_rewards[-1]:.4f}")
+                print(f"Episode {episode}: Loss={total_loss.item():.4f}, Reward={smoothed_rewards[-1]:.4f}, "
+                      f"Policy Loss={policy_loss.item():.4f}, Entropy Loss={entropy_loss.item():.4f}, "
+                      f"Prediction Loss={prediction_loss.item():.4f}")
 
         # Vẽ biểu đồ reward
-        plt.figure(figsize=(6, 4))
+        plt.figure(figsize=(10, 6))
         plt.plot(episode_rewards, alpha=0.3, label='Raw Reward')
         plt.plot(smoothed_rewards, label='Smoothed Reward')
         plt.axhline(y=1.0, color='r', linestyle='--', label='Max Normalized Reward')
         plt.xlabel('Episode')
         plt.ylabel('Reward')
-        plt.xlim(0, 70)  # Giới hạn trục x từ 0 đến 0.3
-        plt.ylim(0, 0.30)
+        plt.xlim(0, episodes)
+        plt.ylim(-1, 2)  # Điều chỉnh ylim để hiển thị rõ hơn
         plt.legend()
+        plt.title('Training Progress')
         plt.savefig('reward_curve.png')
-
-        window_size = 100000000
-        smoothed_ma = np.convolve(episode_rewards, np.ones(window_size) / window_size, mode='valid')
-        plt.plot(smoothed_ma, label=f'MA ({window_size} episodes)')
+        plt.close()
 
         # Lưu model
         save_path = os.path.join(os.path.dirname(__file__), 'model.pt')

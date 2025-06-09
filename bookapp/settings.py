@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'loginapp',
     'bookstore',
     'chatbot',
     'bootstrap_modal_forms',
@@ -93,7 +94,7 @@ WSGI_APPLICATION = 'bookapp.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "mssql",
-        "NAME": "TestRL_HCMUTELibrary_01",
+        "NAME": "TestLogin_HCMUTELibrary_02",
         "USER": "sa",
         "PASSWORD": "123456",
         "HOST": "localhost",

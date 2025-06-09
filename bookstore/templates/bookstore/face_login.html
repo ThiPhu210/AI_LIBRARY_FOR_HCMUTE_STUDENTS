@@ -1,0 +1,96 @@
+{% extends 'bookstore/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Face Recognition Login</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="video-container">
+                            <img src="{% url 'video_feed' %}" class="img-fluid" alt="Video Feed">
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-muted">Please position your face in the center of the frame</p>
+                        <div id="status-message" class="alert alert-info" style="display: none;"></div>
+                        {% if user.is_authenticated %}
+                        <button id="register-face" class="btn btn-primary mt-3">Register Face</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.video-container img {
+    width: 100%;
+    height: auto;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusMessage = document.getElementById('status-message');
+    const registerButton = document.getElementById('register-face');
+    
+    // Check login status every 2 seconds
+    setInterval(function() {
+        fetch('{% url "check_login_status" %}')
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, 2000);
+    
+    // Handle face registration
+    if (registerButton) {
+        registerButton.addEventListener('click', function() {
+            fetch('{% url "register_face" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusMessage.textContent = 'Face registered successfully!';
+                    statusMessage.className = 'alert alert-success';
+                } else {
+                    statusMessage.textContent = 'Failed to register face. Please try again.';
+                    statusMessage.className = 'alert alert-danger';
+                }
+                statusMessage.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusMessage.textContent = 'An error occurred. Please try again.';
+                statusMessage.className = 'alert alert-danger';
+                statusMessage.style.display = 'block';
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

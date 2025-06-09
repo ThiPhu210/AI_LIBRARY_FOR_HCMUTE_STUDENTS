@@ -1,49 +1,67 @@
 {% extends 'librarian/base.html' %}
-
-
-
+{% load static %}
 
 {% block body %}
+<style>
+    .container-fluid {
+        background-color: #f8f9fa;
+        padding-bottom: 20px;
+    }
+
+    .card {
+         margin-bottom: 20px;
+    }
+
+    .row {
+        padding: 0 10px;
+    }
+
+    .card-header h3 {
+        color: #000 !important;
+    }
+</style>
 <div class="container-fluid">
-        <div class="row">
-          <div class="col-12 mb-3">
-          <div class="col-12 mb-3">
-              <div id="content-wrapper">
-        <div class="container-fluid">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="">Book Title : {{ object.title }} </a>
-            </ol>
-            <div class="card mb-3">
-                <div class="card-header">
-                    <i class="fas fa-table text-warning"></i>
-                    Details Of Book
+    <div class="row" style="padding-top: 30px">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-trash fa-2x me-3"></i>
+                        <h3 class="mb-0 fw-bold">Xác Nhận Xóa</h3>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
+                    <!-- Messages -->
                     {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                            {{ message }}
-                        </div>
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                     {% endfor %}
 
-    <div class="row">
-        <div class="col-12">
-            <form method="post">
-                {% csrf_token %}
-                <div class="alert alert-warning" role="alert">
-                  Are you sure to delete detail of book {{ object }} ?
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="alert alert-warning shadow-sm" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Bạn có chắc chắn muốn xóa sách "{{ object }}" không?
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-1"></i>Xóa
+                                    </button>
+                                    <a href="{% url 'lmbook' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>Hủy
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <input type="submit" class="btn btn-danger" value="Yes, delete it" />
-                <a class="btn btn-success" href="{% url 'lmbook' %}">No, just I've tried the delete button</a>
-            </form>
+            </div>
         </div>
     </div>
-
-                  
-
-
-          </div>
-        </div>
-      </div>
-    </div>
+</div>
 {% endblock %}

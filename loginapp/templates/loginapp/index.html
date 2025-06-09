@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Đăng nhập</h3>
+                </div>
+                <div class="card-body">
+                    {% if show_qr %}
+                    <div class="text-center mb-4">
+                        <img src="{{ qr_url }}" alt="QR Code" class="img-fluid">
+                        <p class="mt-2">Quét mã QR để đăng nhập</p>
+                    </div>
+                    {% else %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-grid">
+                                <button class="btn btn-primary" onclick="startFaceRecognition()">
+                                    Đăng nhập bằng khuôn mặt
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-grid">
+                                <form method="post" action="{% url 'show_qr' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">
+                                        Đăng nhập bằng mã QR
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal cho nhận diện khuôn mặt -->
+<div class="modal fade" id="faceRecognitionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nhận diện khuôn mặt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img src="{% url 'video_feed' %}" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function startFaceRecognition() {
+    var modal = new bootstrap.Modal(document.getElementById('faceRecognitionModal'));
+    modal.show();
+    
+    // Kiểm tra trạng thái đăng nhập mỗi 2 giây
+    setInterval(function() {
+        fetch('{% url "check_login_status" %}')
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            });
+    }, 2000);
+}
+</script>
+{% endblock %} 
