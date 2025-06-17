@@ -51,7 +51,7 @@ To build an intelligent library system that enables students to:
 - **ISBN Scanning Support**: Retrieves metadata via ISBN from external APIs.
 - **QR Code Scanning**: Alternate login or checkout method using QR codes.
 
-## Data Collection & Processing
+## 👨‍🌾 Data Collection & Processing
 
 1. **OCR Pipeline**:
    - Uses PaddleOCR + VietOCR to extract text from images of book covers.
@@ -78,7 +78,7 @@ To build an intelligent library system that enables students to:
    - Used Dlib or InsightFace to embed user face images and compare using cosine similarity.
    - Optimized lighting and angle normalization for webcam input.
 
-## 🕵️‍♂️ Deployment
+## 👨‍💻 Deployment
 
 1. **Backend with Flask**:
    - Flask serves REST API endpoints for chatbot, OCR, face login, and book management.
@@ -154,4 +154,27 @@ flowchart TD
 
     D -->|See Recommendations| L[Deep Q-Learning]
     L --> M[Personalized Book Suggestions]
+```
+## 📊 Performance
+### 1. Face Recognition
+![image](https://github.com/user-attachments/assets/9cb0f54a-8804-49dd-8959-ef5d839f6233)
+![image](https://github.com/user-attachments/assets/8f2922dd-a9ff-4bdc-b3f1-3b005f3e3901)
+![image](https://github.com/user-attachments/assets/aa31ddb9-83da-498b-bb53-b1de2335dc48)
+
+### 2. Book Information Extraction
+![image](https://github.com/user-attachments/assets/87845c30-94da-443f-9c0c-617ff99e303d)
+![image](https://github.com/user-attachments/assets/08c90aad-93b5-4f39-8cd2-bca49c1505c8)
+![image](https://github.com/user-attachments/assets/ccc5a283-d204-4dc4-a22c-6382b7f14e85)
+
+### 3. AI Chatbot (RAG)
+![image](https://github.com/user-attachments/assets/18165278-026c-4373-bde2-bc9ad7dee9f2)
+
+### 4. Personalized Book Recommendation
+![image](https://github.com/user-attachments/assets/d41f08be-afd2-4ab9-ad90-cfbd1ebd0c62)
+![image](https://github.com/user-attachments/assets/38f32bf7-c089-4b40-ac0f-c205f1f831c5)
+![image](https://github.com/user-attachments/assets/e73243a2-74b7-41f7-b166-8c8a61ba9e80)
+
+
+
+
 
