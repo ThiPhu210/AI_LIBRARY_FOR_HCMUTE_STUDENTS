@@ -1,4 +1,6 @@
-# Smart Library System
+# SMART AI LIBRARY FOR HCMUTE STUDENTS
+
+![image](https://github.com/user-attachments/assets/cc9257d0-6e90-4203-a296-2c9727aaa182)
 
 ## Description
 
@@ -153,9 +155,3 @@ flowchart TD
     D -->|See Recommendations| L[Deep Q-Learning]
     L --> M[Personalized Book Suggestions]
 
-## ⭐ Future Enhancements
-
-- **LLM Fine-Tuning for Book QA**: Fine-tune a model on Vietnamese book datasets to improve answer quality.
-- **Mobile App Integration**: Extend to Android/iOS for barcode scanning and chatbot access.
-- **Admin Dashboard**: Add librarian dashboard to track book additions and user activity.
-- **Book Recommendation Engine**: Recommend books based on user interests and chat history.
