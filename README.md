@@ -142,7 +142,7 @@ flowchart TD
     C -- No --> X[Access Denied]
     C -- Yes --> D[Access System]
 
-    D -->|Add Book via Image| E[PaddleOCR + LLM]
+    D -->|Add Book via PDF| E[PaddleOCR + LLM]
     E --> F[Extract Title & Author]
 
     D -->|Add Book via ISBN| G[Google Books API]
